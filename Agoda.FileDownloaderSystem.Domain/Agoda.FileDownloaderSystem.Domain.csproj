@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Renci.SshNet.Async" Version="1.4.0" />
+    <PackageReference Include="WinSCP" Version="5.17.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Agoda.FileDownloaderSystem.DataAccess\Agoda.FileDownloaderSystem.DataAccess.csproj" />
+    <ProjectReference Include="..\Agoda.FileDownloaderSystem.DataObjects\Agoda.FileDownloaderSystem.DataObjects.csproj" />
+  </ItemGroup>
+
+</Project>
