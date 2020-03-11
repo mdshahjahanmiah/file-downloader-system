@@ -12,8 +12,8 @@ namespace Agoda.FileDownloaderSystem.DataObjects.Domain
         public DateTime DownloadStartedDate { get; set; }
         public DateTime DownloadEndedDate { get; set; }
         public string Protocol { get; set; }
-        public bool IsLargeData { get; set; }
-        public bool IsSlow { get; set; }
+        public string IsLargeData { get; set; }
+        public string IsSlow { get; set; }
         public int PercentageOfFailure { get; set; }
         public double ElapsedTime { get; set; }
         public double DownloadSpeed { get; set; }

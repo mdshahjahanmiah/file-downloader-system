@@ -14,7 +14,12 @@ namespace Agoda.FileDownloaderSystem.Api
     public class Program
     {
         public static void Main(string[] args)
-        => CreateHostBuilder(args).Build().Run();
+        => CreateHostBuilder(args)
+            .UseDefaultServiceProvider(options => options.ValidateScopes = false)
+            .Build()
+            .Run();
+
+        //.UseDefaultServiceProvider(options => options.ValidateScopes = false)
 
         // EF Core uses this method at design time to access the DbContext
         public static IHostBuilder CreateHostBuilder(string[] args)

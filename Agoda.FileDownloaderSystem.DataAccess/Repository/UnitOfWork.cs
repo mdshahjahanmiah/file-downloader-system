@@ -15,11 +15,11 @@ namespace Agoda.FileDownloaderSystem.DataAccess.Repository
         {
             CommandsContext.SaveChanges();
         }
+
         public void Dispose()
         {
             CommandsContext.Dispose();
             QueriesContext.Dispose();
-
         }
     }
 }

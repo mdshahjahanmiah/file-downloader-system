@@ -10,9 +10,9 @@ namespace Agoda.FileDownloaderSystem.Api
     {
         private void FileDownloaderSystemDependencies(IServiceCollection services, AppSettings settings)
         {
-            services.AddDbContext<FileDownloaderQueriesContext>(options =>
+            services.AddDbContext<FileDownloaderCommandsContext>(options =>
             {
-                options.UseSqlServer(settings.ConnectionStrings.SqlServer.Queries,
+                options.UseSqlServer(settings.ConnectionStrings.SqlServer.Commands,
                 sqlServerOptionsAction: sqlOptions =>
                 {
                     sqlOptions.EnableRetryOnFailure(
@@ -22,9 +22,9 @@ namespace Agoda.FileDownloaderSystem.Api
                 });
             });
 
-            services.AddDbContext<FileDownloaderCommandsContext>(options =>
+            services.AddDbContext<FileDownloaderQueriesContext>(options =>
             {
-                options.UseSqlServer(settings.ConnectionStrings.SqlServer.Commands,
+                options.UseSqlServer(settings.ConnectionStrings.SqlServer.Queries,
                 sqlServerOptionsAction: sqlOptions =>
                 {
                     sqlOptions.EnableRetryOnFailure(

@@ -69,8 +69,10 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
                 string fileName = GetFileNameFromUrl(sourceUrl);
                 if (string.IsNullOrEmpty(fileName)) fileName = "example.txt";
                 string path = _appSettings.DownloadedFileLocation + fileName;
-                if (System.IO.File.Exists(path)) fileName = System.Guid.NewGuid().ToString() + fileName;
-                FileStream fileStream = System.IO.File.Create(_appSettings.DownloadedFileLocation + fileName);
+                
+                if(!Directory.Exists(_appSettings.DownloadedFileLocation)) Directory.CreateDirectory(_appSettings.DownloadedFileLocation);
+                if (File.Exists(path)) fileName = Guid.NewGuid().ToString() + fileName;
+                FileStream fileStream = File.Create(_appSettings.DownloadedFileLocation + fileName);
                 int bytesRead;
                 int PercentProgress = 0;
                 DateTime downloadStarted = DateTime.Now;
@@ -122,7 +124,7 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
             }
             catch (Exception ex) 
             {
-
+                throw ex;
             }
         }
 
@@ -154,8 +156,8 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
                 Destination = path,
                 DownloadStartedDate = downloadStarted,
                 DownloadEndedDate = downloadEnded,
-                IsLargeData = totalSize > _appSettings.VolumeOfData ? true : false,
-                IsSlow = downloadSpeed > _appSettings.VelocityOfData ? false : true,
+                IsLargeData = totalSize > _appSettings.VolumeOfData ? "true" : "false",
+                IsSlow = downloadSpeed > _appSettings.VelocityOfData ? "false" : "true",
                 Protocol = protocol,
                 ProtocolId = DataObjects.Enums.Protocol.GetKey(protocol),
                 StatusId = DataObjects.Enums.Status.GetKey(DataObjects.Enums.Status.Completed),

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Agoda.FileDownloaderSystem.DataAccess.Migrations
 {
-    public partial class filedownloadersystem : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,8 +44,10 @@ namespace Agoda.FileDownloaderSystem.DataAccess.Migrations
                     DownloadStartedDate = table.Column<DateTime>(nullable: false),
                     DownloadEndedDate = table.Column<DateTime>(nullable: false),
                     IsLargeData = table.Column<bool>(nullable: false),
-                    IsSlowOrFirst = table.Column<bool>(nullable: false),
+                    IsSlow = table.Column<bool>(nullable: false),
                     PercentageOfFailure = table.Column<int>(nullable: false),
+                    ElapsedTime = table.Column<double>(nullable: false),
+                    DownloadSpeed = table.Column<double>(nullable: false),
                     StatusId = table.Column<int>(nullable: false),
                     ProtocolId = table.Column<int>(nullable: false)
                 },

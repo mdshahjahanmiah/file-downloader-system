@@ -32,7 +32,6 @@ namespace Agoda.FileDownloaderSystem.Api
             services.AddControllers();
             var settings = GetAppConfigurationSection();
             ConfigureSingletonServices(services);
-            ConfigureScopedServices(services);
             ConfigureTransientServices(services);
             ConfigureJwtAuthentication(services);
             FileDownloaderSystemDependencies(services, settings);
@@ -62,12 +61,8 @@ namespace Agoda.FileDownloaderSystem.Api
         private void ConfigureSingletonServices(IServiceCollection services)
         {
             services.AddSingleton(GetAppConfigurationSection());
-        }
-
-        private void ConfigureScopedServices(IServiceCollection services)
-        {
-            services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddSingleton(typeof(IUnitOfWork), typeof(UnitOfWork));
+            services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
         }
 
         private void ConfigureTransientServices(IServiceCollection services)

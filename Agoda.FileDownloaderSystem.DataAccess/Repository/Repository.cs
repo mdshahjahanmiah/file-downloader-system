@@ -33,6 +33,6 @@ namespace Agoda.FileDownloaderSystem.DataAccess.Repository
         {
             _unitOfWork.CommandsContext.Entry(entity).State = EntityState.Modified;
             _unitOfWork.CommandsContext.Set<T>().Update(entity);
-        }
+        }       
     }
 }

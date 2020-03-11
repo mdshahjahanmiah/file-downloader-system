@@ -2,16 +2,14 @@ using Agoda.FileDownloaderSystem.Api;
 using Agoda.FileDownloaderSystem.DataObjects.Enums;
 using Agoda.FileDownloaderSystem.DataObjects.Settings;
 using Agoda.FileDownloaderSystem.Domain.Interfaces;
-using Agoda.FileDownloaderSystem.Domain.Managers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using System;
 using System.Net;
 using Xunit;
 
 namespace Agoda.FileDownloaderSystem.UnitTest
 {
-    public class HttpProtocolUnitTest
+    public class HttpProtocolUnitTest 
     {
         private DependencyResolverHelpercs _serviceProvider;
         private readonly string url = "http://www.techcoil.com/ph/img/logo.png";
