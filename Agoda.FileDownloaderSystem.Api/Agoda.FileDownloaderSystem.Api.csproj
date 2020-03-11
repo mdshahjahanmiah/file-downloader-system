@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Agoda.FileDownloaderSystem.DataAccess\Agoda.FileDownloaderSystem.DataAccess.csproj" />
+    <ProjectReference Include="..\Agoda.FileDownloaderSystem.DataObjects\Agoda.FileDownloaderSystem.DataObjects.csproj" />
     <ProjectReference Include="..\Agoda.FileDownloaderSystem.Domain\Agoda.FileDownloaderSystem.Domain.csproj" />
     <ProjectReference Include="..\Agoda.FileDownloaderSystem.Security\Agoda.FileDownloaderSystem.Security.csproj" />
     <ProjectReference Include="..\Agoda.FileDownloaderSystem.Validation\Agoda.FileDownloaderSystem.Validation.csproj" />

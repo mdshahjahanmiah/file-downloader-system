@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Agoda.FileDownloaderSystem.DataAccess.Migrations
 {
     [DbContext(typeof(FileDownloaderCommandsContext))]
-    [Migration("20200311065730_Initial")]
-    partial class Initial
+    [Migration("20200311114313_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
