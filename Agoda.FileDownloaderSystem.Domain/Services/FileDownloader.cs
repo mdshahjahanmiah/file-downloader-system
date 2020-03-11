@@ -3,9 +3,8 @@ using Agoda.FileDownloaderSystem.DataObjects.Settings;
 using Agoda.FileDownloaderSystem.Domain.Interfaces;
 using Renci.SshNet;
 using System;
-using System.IO;
 using System.Net;
-using WinSCP;
+using System.Threading.Tasks;
 
 namespace Agoda.FileDownloaderSystem.Domain.Services
 {
@@ -18,7 +17,7 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
             _fileManager = fileManager;
             _appSettings = appSettings;
         }
-        public ServerResponse DownloadDataFromFtpToLocalDisk(string sourceUrl,string protocol)
+        public async Task<ServerResponse> DownloadDataFromFtpToLocalDisk(string sourceUrl,string protocol)
         {
             var serverResponse = ServerResponse.OK;
             try 
@@ -30,8 +29,8 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
                 request.UseBinary = true; // use true for .zip file or false for a text file
                 request.Credentials = new NetworkCredential(_appSettings.FtpNetworkCredential.UserName, _appSettings.FtpNetworkCredential.Password);
 
-                WebResponse response = request.GetResponse();
-                _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, response, protocol);
+                WebResponse response = await request.GetResponseAsync();
+                await _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, response, protocol);
                 return serverResponse;
             }
             catch (Exception ex)
@@ -41,15 +40,15 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
             
         }
 
-        public ServerResponse DownloadDataFromHttpToLocalDisk(string sourceUrl, string protocol)
+        public async Task<ServerResponse> DownloadDataFromHttpToLocalDisk(string sourceUrl, string protocol)
         {
             var response = ServerResponse.OK;
             try 
             {
                 HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(sourceUrl);
                 httpRequest.Method = WebRequestMethods.Http.Get;
-                WebResponse httpResponse = httpRequest.GetResponse();
-                _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, httpResponse, protocol);
+                WebResponse httpResponse = await httpRequest.GetResponseAsync();
+                await _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, httpResponse, protocol);
                 return response;
             }
             catch (Exception ex)
@@ -59,14 +58,14 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
             
         }
 
-        public ServerResponse DownloadDataFromSftpToLocalDisk(string sourceUrl, string protocol)
+        public async Task<ServerResponse> DownloadDataFromSftpToLocalDisk(string sourceUrl, string protocol)
         {
             var response = ServerResponse.OK;
             try 
             {
                 using var sftp = new SftpClient(_appSettings.SftpNetworkCredential.Host, _appSettings.SftpNetworkCredential.Port, _appSettings.SftpNetworkCredential.UserName, _appSettings.SftpNetworkCredential.Password);
                 sftp.Connect();
-                _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, sftp, protocol);
+                await _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, sftp, protocol);
                 sftp.Disconnect();
                 return response;
             }
@@ -77,7 +76,7 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
 
         }
 
-        public ServerResponse DownloadDataFromHttpsToLocalDisk(string sourceUrl, string protocol)
+        public async Task<ServerResponse> DownloadDataFromHttpsToLocalDisk(string sourceUrl, string protocol)
         {
             var serverResponse = ServerResponse.OK;
             try
@@ -87,8 +86,8 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
                 if (string.IsNullOrEmpty(_appSettings.HttpsNetworkCredential.UserName) || string.IsNullOrEmpty(_appSettings.HttpsNetworkCredential.Password))
                     request.Credentials = CredentialCache.DefaultCredentials;
                 else request.Credentials = new NetworkCredential(_appSettings.HttpsNetworkCredential.UserName, _appSettings.HttpsNetworkCredential.Password);
-                WebResponse response = request.GetResponse();
-                _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, response, protocol);
+                WebResponse response = await request.GetResponseAsync();
+                await _fileManager.GetDataFromResponseAndWriteLocalDisk(sourceUrl, response, protocol);
                 response.Close();
                 return serverResponse; 
             }
@@ -98,14 +97,14 @@ namespace Agoda.FileDownloaderSystem.Domain.Services
             }
         }
        
-        public ServerResponse DownloadDataFromTcpToLocalDisk(string sourceUrl, string protocol)
+        public async Task<ServerResponse> DownloadDataFromTcpToLocalDisk(string sourceUrl, string protocol)
         {
-            throw new NotImplementedException();
+            return new ServerResponse() { RespCode = 400, RespDesc = "Not Implemented Yet." };
         }
         
-        public ServerResponse DownloadDataFromPipeToLocalDisk(string sourceUrl, string protocol)
+        public async Task<ServerResponse> DownloadDataFromPipeToLocalDisk(string sourceUrl, string protocol)
         {
-            throw new NotImplementedException();
+            return new ServerResponse() { RespCode = 400, RespDesc = "Not Implemented Yet." };
         }
     }
 }

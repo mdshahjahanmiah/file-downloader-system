@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Agoda.FileDownloaderSystem.Domain.Managers
 {
@@ -56,12 +57,18 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
             return list;
         }
 
-        public void GetDataFromResponseAndWriteLocalDisk(string sourceUrl, WebResponse httpWebResponse,string protocol)
+        public async Task GetDataFromResponseAndWriteLocalDisk(string sourceUrl, WebResponse httpWebResponse,string protocol)
         {
-            try 
+            long totalSize = 0; 
+            DateTime downloadStarted = DateTime.Now; 
+            DateTime downloadEnded = DateTime.Now; 
+            double elapsedTime = 0; 
+            double downloadSpeed = 0;
+            int PercentProgress = 0;
+            try
             {
                 Stream httpResponseStream = httpWebResponse.GetResponseStream();
-                var totalSize = httpWebResponse.ContentLength;
+                totalSize = httpWebResponse.ContentLength;
                 int bufferSize = _appSettings.BufferSize;
                 if (bufferSize > int.MaxValue) bufferSize = int.MaxValue;
                 byte[] buffer = new byte[bufferSize];
@@ -69,62 +76,74 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
                 string fileName = GetFileNameFromUrl(sourceUrl);
                 if (string.IsNullOrEmpty(fileName)) fileName = "example.txt";
                 string path = _appSettings.DownloadedFileLocation + fileName;
-                
-                if(!Directory.Exists(_appSettings.DownloadedFileLocation)) Directory.CreateDirectory(_appSettings.DownloadedFileLocation);
+
+                if (!Directory.Exists(_appSettings.DownloadedFileLocation)) Directory.CreateDirectory(_appSettings.DownloadedFileLocation);
                 if (File.Exists(path)) fileName = Guid.NewGuid().ToString() + fileName;
                 FileStream fileStream = File.Create(_appSettings.DownloadedFileLocation + fileName);
                 int bytesRead;
-                int PercentProgress = 0;
-                DateTime downloadStarted = DateTime.Now;
-                while ((bytesRead = httpResponseStream.Read(buffer, 0, bufferSize)) != 0)
+                downloadStarted = DateTime.Now;
+                while ((bytesRead = await httpResponseStream.ReadAsync(buffer, 0, bufferSize)) != 0)
                 {
                     fileStream.Write(buffer, 0, bytesRead);
                     PercentProgress = Convert.ToInt32((fileStream.Length * 100) / totalSize);
                 }
-                DateTime downloadEnded = DateTime.Now;
-                var elapsedTime = (downloadEnded - downloadStarted).TotalSeconds; // Total time needed in seconds
-                var downloadSpeed = Utiles.ConvertBytesToMegabytes(totalSize) / elapsedTime;  // Calculation for Mbps
-                var entity = DomainObjectToEntity(sourceUrl, protocol, totalSize, path, downloadStarted, downloadEnded, elapsedTime, downloadSpeed);
+                downloadEnded = DateTime.Now;
+                elapsedTime = (downloadEnded - downloadStarted).TotalSeconds; // Total time needed in seconds
+                downloadSpeed = Utiles.ConvertBytesToMegabytes(totalSize) / elapsedTime;  // Calculation for Mbps
+                
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally 
+            {
+                var entity = DomainObjectToEntity(sourceUrl, protocol, totalSize, _appSettings.DownloadedFileLocation, downloadStarted, downloadEnded, elapsedTime, downloadSpeed, PercentProgress);
                 _repository.Add(entity);
                 _unitOfWork.Commit();
             }
-            catch (Exception ex)
-            { 
-
-            }
         }
 
-        public void GetDataFromResponseAndWriteLocalDisk(string sourceUrl, SftpClient sftp, string protocol)
+        public async Task GetDataFromResponseAndWriteLocalDisk(string sourceUrl, SftpClient sftp, string protocol)
         {
-            try 
+            long totalSize = 0;
+            DateTime downloadStarted = DateTime.Now;
+            DateTime downloadEnded = DateTime.Now;
+            double elapsedTime = 0;
+            double downloadSpeed = 0;
+            int PercentProgress = 0;
+            try
             {
                 string fileName = GetFileNameFromUrl(sourceUrl);
                 string path = _appSettings.DownloadedFileLocation + fileName;
-                if (System.IO.File.Exists(path)) fileName = System.Guid.NewGuid().ToString() + fileName;
-                FileStream fileStream = System.IO.File.Create(_appSettings.DownloadedFileLocation + fileName);
+                if (!Directory.Exists(_appSettings.DownloadedFileLocation)) Directory.CreateDirectory(_appSettings.DownloadedFileLocation);
+                if (File.Exists(path)) fileName = Guid.NewGuid().ToString() + fileName;
+                FileStream fileStream = File.Create(_appSettings.DownloadedFileLocation + fileName);
                 int bufferSize = _appSettings.BufferSize;
                 if (bufferSize > int.MaxValue) bufferSize = int.MaxValue;
                 byte[] buffer = new byte[bufferSize];
                 int bytesRead;
-                int PercentProgress = 0;
                 var sftpFileStream = sftp.OpenRead(path);
-                var totalSize = sftpFileStream.Length;
-                DateTime downloadStarted = DateTime.Now;
-                while ((bytesRead = sftpFileStream.Read(buffer, 0, bufferSize)) != 0)
+                totalSize = sftpFileStream.Length;
+                downloadStarted = DateTime.Now;
+                while ((bytesRead = await sftpFileStream.ReadAsync(buffer, 0, bufferSize)) != 0)
                 {
                     fileStream.Write(buffer, 0, bytesRead);
                     PercentProgress = Convert.ToInt32((fileStream.Length * 100) / sftpFileStream.Length);
                 }
-                DateTime downloadEnded = DateTime.Now;
-                var elapsedTime = (downloadEnded - downloadStarted).TotalSeconds; // Total time needed in seconds
-                var downloadSpeed = Utiles.ConvertBytesToMegabytes(totalSize) / elapsedTime;  // Calculation for Mbps
-                var entity = DomainObjectToEntity(sourceUrl, protocol, totalSize, path, downloadStarted, downloadEnded, elapsedTime, downloadSpeed);
-                _repository.Add(entity);
-                _unitOfWork.Commit();
+                downloadEnded = DateTime.Now;
+                elapsedTime = (downloadEnded - downloadStarted).TotalSeconds; // Total time needed in seconds
+                downloadSpeed = Utiles.ConvertBytesToMegabytes(totalSize) / elapsedTime;  // Calculation for Mbps
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw ex;
+            }
+            finally 
+            {
+                var entity = DomainObjectToEntity(sourceUrl, protocol, totalSize, _appSettings.DownloadedFileLocation, downloadStarted, downloadEnded, elapsedTime, downloadSpeed, PercentProgress);
+                _repository.Add(entity);
+                _unitOfWork.Commit();
             }
         }
 
@@ -148,7 +167,7 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
             return protocol;
         }
 
-        private Entities.File DomainObjectToEntity(string sourceUrl, string protocol, long totalSize, string path, DateTime downloadStarted, DateTime downloadEnded, double elapsedTime, double downloadSpeed)
+        private Entities.File DomainObjectToEntity(string sourceUrl, string protocol, long totalSize, string path, DateTime downloadStarted, DateTime downloadEnded, double elapsedTime, double downloadSpeed,int percentProgress)
         {
             return FileMapper.ToCommand(new DataObjects.Domain.File
             {
@@ -160,8 +179,8 @@ namespace Agoda.FileDownloaderSystem.Domain.Managers
                 IsSlow = downloadSpeed > _appSettings.VelocityOfData ? "false" : "true",
                 Protocol = protocol,
                 ProtocolId = DataObjects.Enums.Protocol.GetKey(protocol),
-                StatusId = DataObjects.Enums.Status.GetKey(DataObjects.Enums.Status.Completed),
-                PercentageOfFailure = 0,
+                StatusId = percentProgress == 100 ?  DataObjects.Enums.Status.GetKey(DataObjects.Enums.Status.Completed) : DataObjects.Enums.Status.GetKey(DataObjects.Enums.Status.Failed),
+                PercentageOfFailure = percentProgress == 100 ? 0 : percentProgress,
                 DownloadSpeed = downloadSpeed,
                 ElapsedTime = elapsedTime
             });
