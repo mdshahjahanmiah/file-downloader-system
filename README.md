@@ -4,7 +4,7 @@ Tools:
 Visual Studio 2019, SQL Server Management Studio 18, NodeJS v12.16.1
 
 #How to build and run application:
-Step 1:
+#Step 1:
 Click the “FileDownloaderSystem.sln”. Make sure project is running and have loaded all projects correctly. 
  
 
@@ -46,45 +46,44 @@ N.B. 2 Case fails here because I don’t have any valid FTP and SFTP Server.
 #API Specification:
 
 #API Purpose:  Download file from multiple sources and protocols to local disk.
-Method: Post
-Request Type: FromBody
-Service Consume Type : application/json
-Request URL : http://localhost:54327/FileDownloader
-Request Body: 
-{
-   "Source”: "http://www.techcoil.com/ph/img/logo.png"
-}
+#Method: Post
+#Request Type: FromBody
+#Service Consume Type : application/json
+#Request URL : http://localhost:54327/FileDownloader
+#Request Body: 
+#{
+#   "Source”: "http://www.techcoil.com/ph/img/logo.png"
+#}
 
-Response: 
-{
-    "respCode": 200,
-    "respDesc": null
-}
+#Response: 
+#{
+#   "respCode": 200, #   "respDesc": null
+#}
 
 #API Purpose:  Validation for POST method.
-Method: Post
-Request Type: FromBody
-Service Consume Type : application/json
-Request URL : http://localhost:54327/FileDownloader
-Request Body: 
-{
-   "Source”: " ht://www.techcoil.com/ph/img/logo.png"
-}
+#Method: Post
+#Request Type: FromBody
+#Service Consume Type : application/json
+#Request URL : http://localhost:54327/FileDownloader
+#Request Body: 
+#{
+#   "Source”: " ht://www.techcoil.com/ph/img/logo.png"
+#}
 
-Response: 
-{
-    "respCode": 400,
-    "respDesc": “Please specify the url protocol.”
-}
+#Response: 
+#{
+#    "respCode": 400,
+#    "respDesc": “Please specify the url protocol.”
+#}
 
 
 
 #API Purpose:  Show list of downloads and their status.
-Method: Get
-Request URL : http://localhost:54327/FileDownloader
-Response: 
-[
-    {
+#Method: Get
+#Request URL : http://localhost:54327/FileDownloader
+#Response: 
+#[
+#    {
         "fileId": 1,
         "source": "http://www.techcoil.com/ph/img/logo.png",
         "destination": "C:\\Hasan\\",
@@ -99,8 +98,8 @@ Response:
         "statusId": 1,
         "protocolId": 1,
         "status": "Completed"
-    },
-    {
+#    },
+#    {
         "fileId": 2,
         "source": "https://nvd.nist.gov/download/nvd-rss.xml",
         "destination": "C:\\Hasan\\",
@@ -115,5 +114,5 @@ Response:
         "statusId": 1,
         "protocolId": 2,
         "status": "Completed"
-    }
-]
+#   }
+#]
